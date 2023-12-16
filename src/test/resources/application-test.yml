@@ -1,0 +1,24 @@
+spring:
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:test-schema.sql
+      data-locations: classpath:test-data.sql
+
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    type: com.zaxxer.hikari.HikariDataSource
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+    database: h2
+    open-in-view: false
+  h2:
+    console:
+      enabled: true
