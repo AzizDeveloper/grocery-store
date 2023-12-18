@@ -1,0 +1,20 @@
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/grocery_store_db
+    username: user_db
+    password: pass_db
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
+      platform: postgresql
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    enabled: true
+server:
+  port: 5511
