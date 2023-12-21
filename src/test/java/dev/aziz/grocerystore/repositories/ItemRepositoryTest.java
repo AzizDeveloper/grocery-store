@@ -1,6 +1,7 @@
 package dev.aziz.grocerystore.repositories;
 
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
+import dev.aziz.grocerystore.entities.Category;
 import dev.aziz.grocerystore.entities.Item;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
@@ -34,10 +35,15 @@ class ItemRepositoryTest {
     @Autowired
     private ItemRepository itemRepository;
 
+    //TODO: I should change the test-schema.sql and test-data.sql scripts
     @Test
     void findMovieByIdTest() {
         //given
-        Item item = Item.builder().id(1L).name("Apple").description("A fresh and juicy apple").price(BigDecimal.valueOf(0.500)).category("Fruits").pictureUrl("apple.jpg").weight(100).stockAmount(50).build();
+        Category drinks = new Category(1L, "Drinks", null);
+        Category softs = new Category(2L, "Softs", drinks);
+        Category soda = new Category(3L, "Soda", softs);
+        Item item = Item.builder().id(1L).name("Cola").description("Sugary black drink").price(BigDecimal.valueOf(0.500))
+                .category(soda).pictureUrl("cola.jpg").weight(100).stockAmount(50).build();
 
         //when
         Optional<Item> foundItem = itemRepository.findItemById(1L);
@@ -54,16 +60,24 @@ class ItemRepositoryTest {
     void findAllTest() {
         //given
         List<Item> items = new ArrayList<>();
-        items.add(Item.builder().id(1L).name("Apple").description("A fresh and juicy apple").price(BigDecimal.valueOf(0.500)).category("Fruits").pictureUrl("apple.jpg").weight(100).stockAmount(50).build());
-        items.add(Item.builder().id(2L).name("Banana").description("A ripe and sweet banana").price(BigDecimal.valueOf(0.400)).category("Fruits").pictureUrl("banana.jpg").weight(120).stockAmount(40).build());
-        items.add(Item.builder().id(3L).name("Carrot").description("A crunchy and healthy carrot").price(BigDecimal.valueOf(0.300)).category("Vegetables").pictureUrl("carrot.jpg").weight(80).stockAmount(60).build());
-        items.add(Item.builder().id(4L).name("Milk").description("A carton of fresh milk").price(BigDecimal.valueOf(1.000)).category("Dairy").pictureUrl("milk.jpg").weight(1000).stockAmount(20).build());
-        items.add(Item.builder().id(5L).name("Cheese").description("A block of tasty cheese").price(BigDecimal.valueOf(2.000)).category("Dairy").pictureUrl("cheese.jpg").weight(500).stockAmount(30).build());
+        Category drinks = new Category(1L, "Drinks", null);
+        Category softs = new Category(2L, "Softs", drinks);
+        Category soda = new Category(3L, "Soda", softs);
+        Category tea = new Category(4L, "Tea", softs);
+        Category alcohol = new Category(5L, "Alcohol", drinks);
+        items.add(Item.builder().id(1L).name("Cola").description("Sugary black drink").price(BigDecimal.valueOf(0.500))
+                .category(soda).pictureUrl("cola.jpg").weight(100).stockAmount(50).build());
+        items.add(Item.builder().id(2L).name("Fanta").description("Sugary yellow drink").price(BigDecimal.valueOf(0.400))
+                .category(soda).pictureUrl("fanta.jpg").weight(120).stockAmount(40).build());
+        items.add(Item.builder().id(3L).name("Black tea").description("Black natural tea").price(BigDecimal.valueOf(0.300))
+                .category(tea).pictureUrl("blacktea.jpg").weight(80).stockAmount(60).build());
+        items.add(Item.builder().id(4L).name("Wine").description("An alcoholic drink made from fermented fruit.").price(BigDecimal.valueOf(0.800))
+                .category(alcohol).pictureUrl("wine.jpg").weight(30).stockAmount(20).build());
         //when
         //then
         List<Item> repositoryAll = itemRepository.findAll();
         assertAll(() -> {
-            assertEquals(repositoryAll.size(), 5);
+            assertEquals(repositoryAll.size(), items.size());
             assertEquals(repositoryAll.get(0).getName(), items.get(0).getName());
         });
     }

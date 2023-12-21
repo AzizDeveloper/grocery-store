@@ -1,5 +1,6 @@
 package dev.aziz.grocerystore.dtos;
 
+import dev.aziz.grocerystore.entities.Category;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,5 +18,5 @@ public class ItemSummaryDto {
 
     private String price;
 
-    private String category;
+    private Category category;
 }

@@ -3,6 +3,9 @@ package dev.aziz.grocerystore.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.aziz.grocerystore.dtos.ItemDto;
 import dev.aziz.grocerystore.dtos.ItemSummaryDto;
+import dev.aziz.grocerystore.entities.Category;
+import dev.aziz.grocerystore.entities.Item;
+import dev.aziz.grocerystore.repositories.ItemRepository;
 import dev.aziz.grocerystore.services.ItemService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,11 +39,16 @@ class ItemControllerTest {
     void getAllItemsTest() throws Exception {
         //given
         List<ItemSummaryDto> itemSummaryDtos = new ArrayList<>();
-        itemSummaryDtos.add(new ItemSummaryDto(1L, "Apple", "0.50", "Fruits"));
-        itemSummaryDtos.add(new ItemSummaryDto(2L, "Banana", "0.40", "Fruits"));
-        itemSummaryDtos.add(new ItemSummaryDto(3L, "Carrot", "0.30", "Vegetables"));
-        itemSummaryDtos.add(new ItemSummaryDto(4L, "Milk", "1.00", "Dairy"));
-        itemSummaryDtos.add(new ItemSummaryDto(5L, "Cheese", "2.00", "Dairy"));
+        Category drinks = new Category(1L, "Drinks", null);
+        Category softs = new Category(2L, "Softs", drinks);
+        Category soda = new Category(3L, "Soda", softs);
+        Category tea = new Category(4L, "Tea", softs);
+        Category alcohol = new Category(5L, "Alcohol", drinks);
+        itemSummaryDtos.add(new ItemSummaryDto(1L, "Cola", "0.500", soda));
+        itemSummaryDtos.add(new ItemSummaryDto(2L, "Fanta", "0.400", soda));
+        itemSummaryDtos.add(new ItemSummaryDto(3L, "Black tea", "0.300", tea));
+        itemSummaryDtos.add(new ItemSummaryDto(4L, "Wine", "1.000", alcohol));
+
 
         //when
         when(itemService.getItemSummaries()).thenReturn(itemSummaryDtos);
@@ -47,33 +56,29 @@ class ItemControllerTest {
         //then
         mockMvc.perform(get("/items"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Apple"))
-                .andExpect(jsonPath("$[4].name").value("Cheese"))
-                .andExpect(jsonPath("$[2].price").value(0.3))
-                .andExpect(jsonPath("$[0].name").value("Apple"));
+                .andExpect(jsonPath("$[0].name").value(itemSummaryDtos.get(0).getName()))
+                .andExpect(jsonPath("$[3].name").value(itemSummaryDtos.get(3).getName()))
+                .andExpect(jsonPath("$[2].price").value(itemSummaryDtos.get(2).getPrice()));
+
     }
+
 
     @Test
     void getOneItemTest() throws Exception {
         //given
-        ItemDto bananaItemDto = ItemDto.builder()
-                .id(2L)
-                .name("Banana")
-                .description("A ripe and sweet banana")
-                .price("0.300")
-                .category("Fruits")
-                .pictureUrl("carrot.jpg")
-                .weight(80)
-                .stockAmount(60)
-                .build();
+        Category drinks = new Category(1L, "Drinks", null);
+        Category softs = new Category(2L, "Softs", drinks);
+        Category soda = new Category(3L, "Soda", softs);
+        ItemDto itemDto = ItemDto.builder().id(1L).name("Cola").description("Sugary black drink").price("0.500")
+                .category(soda).pictureUrl("cola.jpg").weight(100).stockAmount(50).build();
         //when
+        when(itemService.getOneItem(1L)).thenReturn(itemDto);
 
-        when(itemService.getOneItem(2L)).thenReturn(bananaItemDto);
         //then
-        mockMvc.perform(get("/items/{id}", bananaItemDto.getId()))
+        mockMvc.perform(get("/items/{id}", itemDto.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Banana"))
-                .andExpect(jsonPath("$.price").value("0.300"))
-                .andExpect(jsonPath("$.description").value("A ripe and sweet banana"));
+                .andExpect(jsonPath("$.name").value(itemDto.getName()))
+                .andExpect(jsonPath("$.price").value(itemDto.getPrice()))
+                .andExpect(jsonPath("$.description").value(itemDto.getDescription()));
     }
 }
