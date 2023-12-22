@@ -8,14 +8,17 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {CategoryMapper.class})
 public interface ItemMapper {
 
+    @Mapping(target = "category", source = "categoryDto")
     Item itemDtoToItem(ItemDto itemDto);
 
+    @Mapping(target = "categoryDto", source = "category")
     ItemDto itemToItemDto(Item item);
 
     @Mapping(target = "price", source = "price")
+    @Mapping(target = "categoryDto", source = "category")
     ItemSummaryDto itemToItemSummaryDto(Item item);
 
     List<ItemDto> itemsToItemDtos(List<Item> items);

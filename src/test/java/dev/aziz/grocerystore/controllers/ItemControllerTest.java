@@ -1,13 +1,16 @@
 package dev.aziz.grocerystore.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.aziz.grocerystore.dtos.CategoryDto;
 import dev.aziz.grocerystore.dtos.ItemDto;
 import dev.aziz.grocerystore.dtos.ItemSummaryDto;
 import dev.aziz.grocerystore.entities.Category;
 import dev.aziz.grocerystore.entities.Item;
+import dev.aziz.grocerystore.mappers.CategoryMapper;
 import dev.aziz.grocerystore.repositories.ItemRepository;
 import dev.aziz.grocerystore.services.ItemService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -35,6 +38,9 @@ class ItemControllerTest {
     @Autowired
     public ObjectMapper objectMapper;
 
+    @Spy
+    private CategoryMapper categoryMapper;
+
     @Test
     void getAllItemsTest() throws Exception {
         //given
@@ -44,10 +50,13 @@ class ItemControllerTest {
         Category soda = new Category(3L, "Soda", softs);
         Category tea = new Category(4L, "Tea", softs);
         Category alcohol = new Category(5L, "Alcohol", drinks);
-        itemSummaryDtos.add(new ItemSummaryDto(1L, "Cola", "0.500", soda));
-        itemSummaryDtos.add(new ItemSummaryDto(2L, "Fanta", "0.400", soda));
-        itemSummaryDtos.add(new ItemSummaryDto(3L, "Black tea", "0.300", tea));
-        itemSummaryDtos.add(new ItemSummaryDto(4L, "Wine", "1.000", alcohol));
+        CategoryDto sodaDto = categoryMapper.categoryToCategoryDto(soda);
+        CategoryDto teaDto = categoryMapper.categoryToCategoryDto(tea);
+        CategoryDto alcoholDto = categoryMapper.categoryToCategoryDto(alcohol);
+        itemSummaryDtos.add(new ItemSummaryDto(1L, "Cola", "0.500", sodaDto));
+        itemSummaryDtos.add(new ItemSummaryDto(2L, "Fanta", "0.400", sodaDto));
+        itemSummaryDtos.add(new ItemSummaryDto(3L, "Black tea", "0.300", teaDto));
+        itemSummaryDtos.add(new ItemSummaryDto(4L, "Wine", "1.000", alcoholDto));
 
 
         //when
@@ -70,7 +79,7 @@ class ItemControllerTest {
         Category softs = new Category(2L, "Softs", drinks);
         Category soda = new Category(3L, "Soda", softs);
         ItemDto itemDto = ItemDto.builder().id(1L).name("Cola").description("Sugary black drink").price("0.500")
-                .category(soda).pictureUrl("cola.jpg").weight(100).stockAmount(50).build();
+                .categoryDto(categoryMapper.categoryToCategoryDto(soda)).pictureUrl("cola.jpg").weight(100).stockAmount(50).build();
         //when
         when(itemService.getOneItem(1L)).thenReturn(itemDto);
 

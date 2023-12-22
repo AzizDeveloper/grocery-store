@@ -3,16 +3,20 @@ package dev.aziz.grocerystore.services;
 import dev.aziz.grocerystore.dtos.ItemSummaryDto;
 import dev.aziz.grocerystore.entities.Category;
 import dev.aziz.grocerystore.entities.Item;
+import dev.aziz.grocerystore.mappers.CategoryMapper;
+import dev.aziz.grocerystore.mappers.CategoryMapperImpl;
 import dev.aziz.grocerystore.mappers.ItemMapper;
 import dev.aziz.grocerystore.mappers.ItemMapperImpl;
 import dev.aziz.grocerystore.repositories.CategoryRepository;
 import dev.aziz.grocerystore.repositories.ItemRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -31,6 +35,13 @@ class CategoryServiceTest {
     @Spy
     private ItemMapper itemMapper = new ItemMapperImpl();
 
+    @Spy
+    private CategoryMapper categoryMapper = new CategoryMapperImpl();
+
+    @BeforeEach
+    public void setUp() {
+        ReflectionTestUtils.setField(itemMapper, "categoryMapper", categoryMapper);
+    }
 
     @Mock
     private CategoryRepository categoryRepository;

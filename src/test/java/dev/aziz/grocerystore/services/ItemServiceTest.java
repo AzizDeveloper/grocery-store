@@ -4,6 +4,8 @@ import dev.aziz.grocerystore.dtos.ItemDto;
 import dev.aziz.grocerystore.dtos.ItemSummaryDto;
 import dev.aziz.grocerystore.entities.Category;
 import dev.aziz.grocerystore.entities.Item;
+import dev.aziz.grocerystore.mappers.CategoryMapper;
+import dev.aziz.grocerystore.mappers.CategoryMapperImpl;
 import dev.aziz.grocerystore.mappers.ItemMapper;
 import dev.aziz.grocerystore.mappers.ItemMapperImpl;
 import dev.aziz.grocerystore.repositories.ItemRepository;
@@ -14,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -33,6 +36,8 @@ class ItemServiceTest {
     @Spy
     private ItemMapper itemMapper = new ItemMapperImpl();
 
+    @Spy
+    private CategoryMapper categoryMapper = new CategoryMapperImpl();
 
     @Mock
     private ItemRepository itemRepository;
@@ -42,6 +47,7 @@ class ItemServiceTest {
 
     @BeforeEach
     public void setUp() {
+        ReflectionTestUtils.setField(itemMapper, "categoryMapper", categoryMapper);
         items.clear();
         Category drinks = new Category(1L, "Drinks", null);
         Category softs = new Category(2L, "Softs", drinks);
@@ -84,7 +90,7 @@ class ItemServiceTest {
         //then
         assertAll(() -> {
             assertEquals(items.get(1).getName(), itemDto.getName());
-            assertEquals(items.get(1).getCategory().getName(), itemDto.getCategory().getName());
+            assertEquals(items.get(1).getCategory().getName(), itemDto.getCategoryDto().getName());
         });
     }
 }

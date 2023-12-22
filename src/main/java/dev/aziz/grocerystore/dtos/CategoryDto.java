@@ -9,13 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ItemSummaryDto {
+public class CategoryDto {
 
     private Long id;
 
     private String name;
 
-    private String price;
-
-    private CategoryDto categoryDto;
 }

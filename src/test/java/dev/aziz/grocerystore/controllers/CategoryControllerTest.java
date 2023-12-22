@@ -1,8 +1,8 @@
 package dev.aziz.grocerystore.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.aziz.grocerystore.dtos.CategoryDto;
 import dev.aziz.grocerystore.dtos.ItemSummaryDto;
-import dev.aziz.grocerystore.entities.Category;
 import dev.aziz.grocerystore.services.CategoryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,9 +64,9 @@ class CategoryControllerTest {
     void getItemsByCategoryTest() throws Exception {
         //given
         List<ItemSummaryDto> itemSummaryDtos = new ArrayList<>();
-        Category soda = new Category(3L, "Soda", null);
-        itemSummaryDtos.add(ItemSummaryDto.builder().id(1L).name("Cola").price("0.500").category(soda).build());
-        itemSummaryDtos.add(ItemSummaryDto.builder().id(2L).name("Fanta").price("0.400").category(soda).build());
+        CategoryDto soda = new CategoryDto(3L, "Soda");
+        itemSummaryDtos.add(ItemSummaryDto.builder().id(1L).name("Cola").price("0.500").categoryDto(soda).build());
+        itemSummaryDtos.add(ItemSummaryDto.builder().id(2L).name("Fanta").price("0.400").categoryDto(soda).build());
         String categoryName = "Soda";
 
         //when

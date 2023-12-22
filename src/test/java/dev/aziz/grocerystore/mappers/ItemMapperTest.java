@@ -1,14 +1,14 @@
 package dev.aziz.grocerystore.mappers;
 
+import dev.aziz.grocerystore.dtos.CategoryDto;
 import dev.aziz.grocerystore.dtos.ItemDto;
 import dev.aziz.grocerystore.dtos.ItemSummaryDto;
 import dev.aziz.grocerystore.entities.Category;
 import dev.aziz.grocerystore.entities.Item;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -22,14 +22,21 @@ class ItemMapperTest {
     @Spy
     private ItemMapper itemMapper = new ItemMapperImpl();
 
+    @Spy
+    private CategoryMapper categoryMapper = new CategoryMapperImpl();
+
+    @BeforeEach
+    public void setUp() {
+        ReflectionTestUtils.setField(itemMapper, "categoryMapper", categoryMapper);
+    }
+
     @Test
     void itemDtoToItemTest() {
         //given
-        Category drinks = new Category(1L, "Drinks", null);
-        Category softs = new Category(2L, "Softs", drinks);
-        Category soda = new Category(3L, "Soda", softs);
-        ItemDto itemDto = ItemDto.builder().id(1L).name("Cola").description("Sugary black drink").price("0.500")
-                .category(soda).pictureUrl("cola.jpg").weight(100).stockAmount(50).build();
+        CategoryDto soda = new CategoryDto(3L, "Soda");
+        ItemDto itemDto = ItemDto.builder().id(1L).name("Cola").description("Sugary black drink")
+                .price("0.500")
+                .categoryDto(soda).pictureUrl("cola.jpg").weight(100).stockAmount(50).build();
         Item item = itemMapper.itemDtoToItem(itemDto);
         //then
         assertAll(() -> {
@@ -101,7 +108,7 @@ class ItemMapperTest {
         //then
         assertAll(() -> {
             assertEquals(item.getName(), itemSummaryDto.getName());
-            assertEquals(item.getCategory(), itemSummaryDto.getCategory());
+            assertEquals(item.getCategory().getName(), itemSummaryDto.getCategoryDto().getName());
         });
     }
 

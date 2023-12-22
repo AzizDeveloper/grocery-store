@@ -35,7 +35,6 @@ class ItemRepositoryTest {
     @Autowired
     private ItemRepository itemRepository;
 
-    //TODO: I should change the test-schema.sql and test-data.sql scripts
     @Test
     void findMovieByIdTest() {
         //given
