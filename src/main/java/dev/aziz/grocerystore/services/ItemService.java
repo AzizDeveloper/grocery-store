@@ -2,6 +2,7 @@ package dev.aziz.grocerystore.services;
 
 import dev.aziz.grocerystore.dtos.ItemDto;
 import dev.aziz.grocerystore.dtos.ItemSummaryDto;
+import dev.aziz.grocerystore.entities.Item;
 import dev.aziz.grocerystore.exceptions.AppException;
 import dev.aziz.grocerystore.mappers.ItemMapper;
 import dev.aziz.grocerystore.repositories.ItemRepository;
@@ -26,4 +27,12 @@ public class ItemService {
         return itemMapper.itemToItemDto(itemRepository.findItemById(id)
                 .orElseThrow(() -> new AppException("Item not found.", HttpStatus.NOT_FOUND)));
     }
+
+    public List<ItemSummaryDto> getItemsByCategoryName(String categoryName) {
+        List<Item> items = itemRepository.findItemsByCategoryName(categoryName)
+                .orElseThrow(() -> new AppException("Item not found.", HttpStatus.NOT_FOUND));
+        List<ItemSummaryDto> itemSummaryDtos = itemMapper.itemsToItemSummaryDtos(items);
+        return itemSummaryDtos;
+    }
+
 }

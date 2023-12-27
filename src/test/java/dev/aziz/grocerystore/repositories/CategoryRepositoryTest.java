@@ -34,7 +34,7 @@ class CategoryRepositoryTest {
     @Test
     void getSubcategoriesOrGivenCategoryByNameTest() {
         //given
-        List<String> subCategories = List.of("Softs", "Soda", "Tea");
+        List<String> subCategories = List.of("Soda", "Tea");
         String categoryName = "Softs";
 
         //when

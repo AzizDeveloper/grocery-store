@@ -3,8 +3,14 @@ package dev.aziz.grocerystore.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.aziz.grocerystore.dtos.CategoryDto;
 import dev.aziz.grocerystore.dtos.ItemSummaryDto;
+import dev.aziz.grocerystore.mappers.CategoryMapper;
+import dev.aziz.grocerystore.mappers.CategoryMapperImpl;
+import dev.aziz.grocerystore.mappers.ItemMapper;
+import dev.aziz.grocerystore.mappers.ItemMapperImpl;
 import dev.aziz.grocerystore.services.CategoryService;
+import dev.aziz.grocerystore.services.ItemService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,6 +33,9 @@ class CategoryControllerTest {
     @MockBean
     public CategoryService categoryService;
 
+    @MockBean
+    public ItemService itemService;
+
     @Autowired
     public ObjectMapper objectMapper;
 
@@ -46,10 +55,26 @@ class CategoryControllerTest {
     }
 
     @Test
+    void getAllMainCategoriesTest() throws Exception {
+        //given
+        List<CategoryDto> categories = List.of(CategoryDto.builder().id(1L).name("Drinks").build());
+
+        //when
+        when(categoryService.getCategoriesByParentCategoryIsNull()).thenReturn(categories);
+
+        //then
+        mockMvc.perform(get("/categories/main"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0]").value(categories.get(0)))
+                .andExpect(jsonPath("$[0].name").value(categories.get(0).getName()));
+    }
+
+    @Test
     void getSubcategoriesTest() throws Exception {
         //given
-        List<String> subCategories = List.of("Softs", "Soda", "Tea");
+        List<String> subCategories = List.of("Soda", "Tea");
         String name = "Softs";
+
         //when
         when(categoryService.getAllSubcategoriesNames(name)).thenReturn(subCategories);
 
@@ -61,7 +86,7 @@ class CategoryControllerTest {
     }
 
     @Test
-    void getItemsByCategoryTest() throws Exception {
+    void getItemsByCategoryNameTest() throws Exception {
         //given
         List<ItemSummaryDto> itemSummaryDtos = new ArrayList<>();
         CategoryDto soda = new CategoryDto(3L, "Soda");
@@ -70,7 +95,7 @@ class CategoryControllerTest {
         String categoryName = "Soda";
 
         //when
-        when(categoryService.getItemsByCategories(categoryName)).thenReturn(itemSummaryDtos);
+        when(itemService.getItemsByCategoryName(categoryName)).thenReturn(itemSummaryDtos);
 
         //then
         mockMvc.perform(get("/categories/{name}/items", categoryName))

@@ -32,6 +32,9 @@ class CategoryServiceTest {
     @InjectMocks
     private CategoryService categoryService;
 
+    @InjectMocks
+    private ItemService itemService;
+
     @Spy
     private ItemMapper itemMapper = new ItemMapperImpl();
 
@@ -73,10 +76,11 @@ class CategoryServiceTest {
     @Test
     void getAllSubcategoriesNames() {
         //given
-        List<String> subCategories = List.of("Softs", "Soda", "Tea");
-        String categoryName = "Soda";
+        List<String> subCategories = List.of("Soda", "Tea");
+        String categoryName = "Softs";
 
         //when
+        when(categoryRepository.findByName(categoryName)).thenReturn(Optional.of(new Category()));
         when(categoryRepository.getSubcategoriesOrGivenCategoryByName(categoryName)).thenReturn(Optional.of(subCategories));
         List<String> categoriesNames = categoryService.getAllSubcategoriesNames(categoryName);
 
@@ -101,7 +105,7 @@ class CategoryServiceTest {
 
         //when
         when(itemRepository.findItemsByCategoryName(categoryName)).thenReturn(Optional.of(items));
-        List<ItemSummaryDto> itemsByCategoryName = categoryService.getItemsByCategories(categoryName);
+        List<ItemSummaryDto> itemsByCategoryName = itemService.getItemsByCategoryName(categoryName);
 
         //then
         assertAll(() -> {

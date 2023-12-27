@@ -1,7 +1,9 @@
 package dev.aziz.grocerystore.controllers;
 
+import dev.aziz.grocerystore.dtos.CategoryDto;
 import dev.aziz.grocerystore.dtos.ItemSummaryDto;
 import dev.aziz.grocerystore.services.CategoryService;
+import dev.aziz.grocerystore.services.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,10 +19,21 @@ import java.util.List;
 public class CategoryController {
 
     private final CategoryService categoryService;
+    private final ItemService itemService;
 
     @GetMapping
     public ResponseEntity<List<String>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategoriesNames());
+    }
+
+    @GetMapping("/main")
+    public ResponseEntity<List<CategoryDto>> getAllMainCategories() {
+        return ResponseEntity.ok(categoryService.getCategoriesByParentCategoryIsNull());
+    }
+
+    @GetMapping("/subcategories")
+    public ResponseEntity<List<CategoryDto>> getAllSubCategories() {
+        return ResponseEntity.ok(categoryService.getCategoriesByParentCategoryIsNotNull());
     }
 
     @GetMapping("/{name}/subcategories")
@@ -29,8 +42,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{name}/items")
-    public ResponseEntity<List<ItemSummaryDto>> getItemsByCategory(@PathVariable String name) {
-        return ResponseEntity.ok(categoryService.getItemsByCategories(name));
+    public ResponseEntity<List<ItemSummaryDto>> getItemsByCategoryName(@PathVariable String name) {
+        return ResponseEntity.ok(itemService.getItemsByCategoryName(name));
     }
-
 }
