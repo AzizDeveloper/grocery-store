@@ -6,8 +6,11 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,23 +41,22 @@ public class Item {
     @NotEmpty(message = "Description should not be empty")
     private String description;
 
-    @NotEmpty(message = "Price should not be empty")
+    @NotNull(message = "Price should not be empty")
     @Column(precision = 8, scale = 3)
     private BigDecimal price;
-//    precision of 8 and a scale of 3
-//    private String price;
 
-    @NotEmpty(message = "Category should not be empty")
-    private String category;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @NotEmpty(message = "Picture should not be empty")
     @Column(name = "picture_url")
     private String pictureUrl;
 
-    @NotEmpty(message = "Weight should not be empty")
+    @NotNull(message = "Weight should not be empty")
     private Integer weight;
 
-    @NotEmpty(message = "Stock amount should not be empty")
+    @NotNull(message = "Stock amount should not be empty")
     @Column(name = "stock_amount")
     private Integer stockAmount;
 

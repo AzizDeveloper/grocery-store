@@ -1,13 +1,14 @@
 package dev.aziz.grocerystore.mappers;
 
+import dev.aziz.grocerystore.dtos.CategoryDto;
 import dev.aziz.grocerystore.dtos.ItemDto;
 import dev.aziz.grocerystore.dtos.ItemSummaryDto;
+import dev.aziz.grocerystore.entities.Category;
 import dev.aziz.grocerystore.entities.Item;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -16,16 +17,26 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ItemMapperTest {
+class ItemMapperTest {
 
     @Spy
     private ItemMapper itemMapper = new ItemMapperImpl();
 
+    @Spy
+    private CategoryMapper categoryMapper = new CategoryMapperImpl();
+
+    @BeforeEach
+    public void setUp() {
+        ReflectionTestUtils.setField(itemMapper, "categoryMapper", categoryMapper);
+    }
+
     @Test
     void itemDtoToItemTest() {
         //given
-        ItemDto itemDto = ItemDto.builder().id(1L).name("Apple").description("A fresh and juicy apple").price("0.500").category("Fruits").pictureUrl("apple.jpg").weight(100).stockAmount(50).build();
-        //when
+        CategoryDto soda = new CategoryDto(3L, "Soda");
+        ItemDto itemDto = ItemDto.builder().id(1L).name("Cola").description("Sugary black drink")
+                .price("0.500")
+                .categoryDto(soda).pictureUrl("cola.jpg").weight(100).stockAmount(50).build();
         Item item = itemMapper.itemDtoToItem(itemDto);
         //then
         assertAll(() -> {
@@ -38,15 +49,19 @@ public class ItemMapperTest {
     @Test
     void itemToItemDtoTest() {
         //given
-        Item appleItem = Item.builder().id(1L).name("Apple").description("A fresh and juicy apple").price(BigDecimal.valueOf(0.500)).category("Fruits").pictureUrl("apple.jpg").weight(100).stockAmount(50).build();
+        Category drinks = new Category(1L, "Drinks", null);
+        Category softs = new Category(2L, "Softs", drinks);
+        Category soda = new Category(3L, "Soda", softs);
+        Item item = Item.builder().id(1L).name("Cola").description("Sugary black drink").price(BigDecimal.valueOf(0.500))
+                .category(soda).pictureUrl("cola.jpg").weight(100).stockAmount(50).build();
 
         //when
-        ItemDto itemDto = itemMapper.itemToItemDto(appleItem);
+        ItemDto itemDto = itemMapper.itemToItemDto(item);
 
         //then
         assertAll(() -> {
-            assertEquals(appleItem.getName(), itemDto.getName());
-            assertEquals(appleItem.getWeight(), itemDto.getWeight());
+            assertEquals(item.getName(), itemDto.getName());
+            assertEquals(item.getWeight(), itemDto.getWeight());
         });
     }
 
@@ -54,11 +69,19 @@ public class ItemMapperTest {
     void itemsToItemDtosTest() {
         //given
         List<Item> items = new ArrayList<>();
-        items.add(Item.builder().id(1L).name("Apple").description("A fresh and juicy apple").price(BigDecimal.valueOf(0.500)).category("Fruits").pictureUrl("apple.jpg").weight(100).stockAmount(50).build());
-        items.add(Item.builder().id(2L).name("Banana").description("A ripe and sweet banana").price(BigDecimal.valueOf(0.400)).category("Fruits").pictureUrl("banana.jpg").weight(120).stockAmount(40).build());
-        items.add(Item.builder().id(3L).name("Carrot").description("A crunchy and healthy carrot").price(BigDecimal.valueOf(0.300)).category("Vegetables").pictureUrl("carrot.jpg").weight(80).stockAmount(60).build());
-        items.add(Item.builder().id(4L).name("Milk").description("A carton of fresh milk").price(BigDecimal.valueOf(1.000)).category("Dairy").pictureUrl("milk.jpg").weight(1000).stockAmount(20).build());
-        items.add(Item.builder().id(5L).name("Cheese").description("A block of tasty cheese").price(BigDecimal.valueOf(2.000)).category("Dairy").pictureUrl("cheese.jpg").weight(500).stockAmount(30).build());
+        Category drinks = new Category(1L, "Drinks", null);
+        Category softs = new Category(2L, "Softs", drinks);
+        Category soda = new Category(3L, "Soda", softs);
+        Category tea = new Category(4L, "Tea", softs);
+        Category alcohol = new Category(5L, "Alcohol", drinks);
+        items.add(Item.builder().id(1L).name("Cola").description("Sugary black drink").price(BigDecimal.valueOf(0.500))
+                .category(soda).pictureUrl("cola.jpg").weight(100).stockAmount(50).build());
+        items.add(Item.builder().id(2L).name("Fanta").description("Sugary yellow drink").price(BigDecimal.valueOf(0.400))
+                .category(soda).pictureUrl("fanta.jpg").weight(120).stockAmount(40).build());
+        items.add(Item.builder().id(3L).name("Black tea").description("Black natural tea").price(BigDecimal.valueOf(0.300))
+                .category(tea).pictureUrl("blacktea.jpg").weight(80).stockAmount(60).build());
+        items.add(Item.builder().id(4L).name("Wine").description("An alcoholic drink made from fermented fruit.").price(BigDecimal.valueOf(0.800))
+                .category(alcohol).pictureUrl("wine.jpg").weight(30).stockAmount(20).build());
         //when
         List<ItemDto> itemDtos = itemMapper.itemsToItemDtos(items);
         //then
@@ -73,15 +96,19 @@ public class ItemMapperTest {
     @Test
     void itemToItemSummaryDtoTest() {
         //given
-        Item appleItem = Item.builder().id(1L).name("Apple").description("A fresh and juicy apple").price(BigDecimal.valueOf(0.500)).category("Fruits").pictureUrl("apple.jpg").weight(100).stockAmount(50).build();
+        Category drinks = new Category(1L, "Drinks", null);
+        Category softs = new Category(2L, "Softs", drinks);
+        Category soda = new Category(3L, "Soda", softs);
+        Item item = Item.builder().id(1L).name("Cola").description("Sugary black drink").price(BigDecimal.valueOf(0.500))
+                .category(soda).pictureUrl("cola.jpg").weight(100).stockAmount(50).build();
 
         //when
-        ItemSummaryDto itemSummaryDto = itemMapper.itemToItemSummaryDto(appleItem);
+        ItemSummaryDto itemSummaryDto = itemMapper.itemToItemSummaryDto(item);
 
         //then
         assertAll(() -> {
-            assertEquals(appleItem.getName(), itemSummaryDto.getName());
-            assertEquals(appleItem.getCategory(), itemSummaryDto.getCategory());
+            assertEquals(item.getName(), itemSummaryDto.getName());
+            assertEquals(item.getCategory().getName(), itemSummaryDto.getCategoryDto().getName());
         });
     }
 
@@ -89,11 +116,19 @@ public class ItemMapperTest {
     void itemsToItemSummaryDtos() {
         //given
         List<Item> items = new ArrayList<>();
-        items.add(Item.builder().id(1L).name("Apple").description("A fresh and juicy apple").price(BigDecimal.valueOf(0.500)).category("Fruits").pictureUrl("apple.jpg").weight(100).stockAmount(50).build());
-        items.add(Item.builder().id(2L).name("Banana").description("A ripe and sweet banana").price(BigDecimal.valueOf(0.400)).category("Fruits").pictureUrl("banana.jpg").weight(120).stockAmount(40).build());
-        items.add(Item.builder().id(3L).name("Carrot").description("A crunchy and healthy carrot").price(BigDecimal.valueOf(0.300)).category("Vegetables").pictureUrl("carrot.jpg").weight(80).stockAmount(60).build());
-        items.add(Item.builder().id(4L).name("Milk").description("A carton of fresh milk").price(BigDecimal.valueOf(1.000)).category("Dairy").pictureUrl("milk.jpg").weight(1000).stockAmount(20).build());
-        items.add(Item.builder().id(5L).name("Cheese").description("A block of tasty cheese").price(BigDecimal.valueOf(2.000)).category("Dairy").pictureUrl("cheese.jpg").weight(500).stockAmount(30).build());
+        Category drinks = new Category(1L, "Drinks", null);
+        Category softs = new Category(2L, "Softs", drinks);
+        Category soda = new Category(3L, "Soda", softs);
+        Category tea = new Category(4L, "Tea", softs);
+        Category alcohol = new Category(5L, "Alcohol", drinks);
+        items.add(Item.builder().id(1L).name("Cola").description("Sugary black drink").price(BigDecimal.valueOf(0.500))
+                .category(soda).pictureUrl("cola.jpg").weight(100).stockAmount(50).build());
+        items.add(Item.builder().id(2L).name("Fanta").description("Sugary yellow drink").price(BigDecimal.valueOf(0.400))
+                .category(soda).pictureUrl("fanta.jpg").weight(120).stockAmount(40).build());
+        items.add(Item.builder().id(3L).name("Black tea").description("Black natural tea").price(BigDecimal.valueOf(0.300))
+                .category(tea).pictureUrl("blacktea.jpg").weight(80).stockAmount(60).build());
+        items.add(Item.builder().id(4L).name("Wine").description("An alcoholic drink made from fermented fruit.").price(BigDecimal.valueOf(0.800))
+                .category(alcohol).pictureUrl("wine.jpg").weight(30).stockAmount(20).build());
         //when
         List<ItemSummaryDto> itemSummaryDtos = itemMapper.itemsToItemSummaryDtos(items);
         //then

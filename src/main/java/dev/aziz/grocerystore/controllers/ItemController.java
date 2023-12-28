@@ -2,8 +2,6 @@ package dev.aziz.grocerystore.controllers;
 
 import dev.aziz.grocerystore.dtos.ItemDto;
 import dev.aziz.grocerystore.dtos.ItemSummaryDto;
-import dev.aziz.grocerystore.entities.Item;
-import dev.aziz.grocerystore.repositories.ItemRepository;
 import dev.aziz.grocerystore.services.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

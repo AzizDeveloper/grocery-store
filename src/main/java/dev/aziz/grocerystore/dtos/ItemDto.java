@@ -1,8 +1,5 @@
 package dev.aziz.grocerystore.dtos;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,8 +27,7 @@ public class ItemDto {
     @NotEmpty(message = "Price should not be empty")
     private String price;
 
-    @NotEmpty(message = "Category should not be empty")
-    private String category;
+    private CategoryDto categoryDto;
 
     @NotEmpty(message = "Picture should not be empty")
     private String pictureUrl;

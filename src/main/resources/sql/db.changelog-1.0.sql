@@ -15,3 +15,20 @@ CREATE TABLE item (
     last_modified_date TIMESTAMPTZ
 );
 
+--changeset aziz:3
+
+CREATE TABLE category (
+    id BIGSERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    parent_category_id BIGINT,
+    FOREIGN KEY (parent_category_id) REFERENCES category(id)
+);
+
+--changeset aziz:4
+
+TRUNCATE TABLE item;
+
+ALTER TABLE item
+DROP COLUMN category,
+ADD COLUMN category_id BIGINT NOT NULL,
+ADD FOREIGN KEY (category_id) REFERENCES category(id);
