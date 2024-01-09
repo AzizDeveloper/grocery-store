@@ -7,10 +7,10 @@ import dev.aziz.grocerystore.dtos.UserDto;
 import dev.aziz.grocerystore.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
@@ -38,12 +38,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signout")
-    public ResponseEntity<Void> logOut(@RequestHeader("Authorization") String bearerToken) {
-        String token = bearerToken.split(" ")[1];
-        Authentication authentication = userAuthProvider.validateToken(token);
-        UserDto userDto = (UserDto) authentication.getPrincipal();
-        String login = userDto.getLogin();
-        userService.logOut(login);
+    public ResponseEntity<Void> logOut(@AuthenticationPrincipal UserDto userDto) {
+        SecurityContextHolder.clearContext();
         return ResponseEntity.noContent().build();
     }
 

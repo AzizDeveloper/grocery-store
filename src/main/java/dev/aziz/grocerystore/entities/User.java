@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,7 +35,7 @@ public class User {
     @NotNull(message = "Login should not be empty")
     private String login;
 
-    @NotEmpty(message = "Password should not be empty")
-    private char[] password;
+    @NotNull(message = "Password should not be empty")
+    private String password;
 
 }
