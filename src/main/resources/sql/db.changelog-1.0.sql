@@ -32,3 +32,13 @@ ALTER TABLE item
 DROP COLUMN category,
 ADD COLUMN category_id BIGINT NOT NULL,
 ADD FOREIGN KEY (category_id) REFERENCES category(id);
+
+--changeset aziz:7
+CREATE TABLE IF NOT EXISTS app_user (
+    id SERIAL PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    login VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+--rollback drop table app_user;

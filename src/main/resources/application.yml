@@ -1,3 +1,4 @@
+security.jwt.token.secret-key: my-secret-key
 
 spring:
   datasource:
