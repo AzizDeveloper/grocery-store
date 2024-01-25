@@ -28,3 +28,18 @@ INSERT INTO item (id, name, description, price, category_id, picture_url, weight
 VALUES (3, 'Black tea', 'Black natural tea', 0.300, 4, 'blacktea.jpg', 80, 60, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO item (id, name, description, price, category_id, picture_url, weight, stock_amount, created_date, last_modified_date)
 VALUES (4, 'Wine', 'An alcoholic drink made from fermented fruit.', 0.800, 5, 'wine.jpg', 30, 20, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+--changeset aziz:9
+
+INSERT INTO app_user (id, first_name, last_name, login, password)
+VALUES (2, 'Bruno', 'Fernandes', 'bruno', '$2a$10$0wkdHjGwk/MR75aFYKxyN.w1kzZY6pnmQrfp.4XoebRLAZuFsplCO');
+INSERT INTO app_user (id, first_name, last_name, login, password)
+VALUES (3, 'Bob', 'Martin', 'bob', '$2a$10$lsxyv7xQbeyGdtKAOwF93.C0Y1y4/Y83iay2thyBBJU0BK7NO7W1C');
+
+INSERT INTO basket_item (user_id, item_id, amount) VALUES (2, 1, 10);
+INSERT INTO basket_item (user_id, item_id, amount) VALUES (2, 2, 20);
+INSERT INTO basket_item (user_id, item_id, amount) VALUES (2, 3, 30);
+INSERT INTO basket_item (user_id, item_id, amount) VALUES (2, 1, 50);
+INSERT INTO basket_item (user_id, item_id, amount) VALUES (3, 3, 20);
+INSERT INTO basket_item (user_id, item_id, amount) VALUES (3, 3, 30);
+INSERT INTO basket_item (user_id, item_id, amount) VALUES (3, 1, 50);
