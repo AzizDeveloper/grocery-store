@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -32,20 +33,38 @@ public class BasketItemService {
     private final BasketItemMapper basketItemMapper;
 
 
-    public BasketItem addItem(String login, Long itemId, Integer amount) {
+    public BasketItemDto addItem(String login, Long itemId, Integer amount) {
         Item item = itemRepository.findItemById(itemId)
                 .orElseThrow(() -> new AppException("Item not found.", HttpStatus.NOT_FOUND));
 
         User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new AppException("User not found.", HttpStatus.NOT_FOUND));
-        BasketItem saved = basketItemRepository.save(
-                BasketItem.builder()
-                        .user(user)
-                        .item(item)
-                        .amount(amount)
-                        .build()
-        );
-        return saved;
+
+        Optional<BasketItem> basketsByUserId = basketItemRepository
+                .findBasketItemByUserIdAndItemId(user.getId(), item.getId());
+
+        BasketItem saved;
+        if (basketsByUserId.isPresent()) {
+            saved = basketItemRepository.save(
+                    BasketItem.builder()
+                            .id(basketsByUserId.get().getId())
+                            .user(user)
+                            .item(item)
+                            .amount(basketsByUserId.get().getAmount() + amount)
+                            .build()
+            );
+        } else {
+            saved = basketItemRepository.save(
+                    BasketItem.builder()
+                            .user(user)
+                            .item(item)
+                            .amount(amount)
+                            .build()
+            );
+        }
+
+        BasketItemDto basketItemDto = basketItemMapper.basketItemToBasketItemDto(saved);
+        return basketItemDto;
     }
 
     public BasketTotalDto getItems(String login) {
@@ -61,39 +80,23 @@ public class BasketItemService {
             basketItemDtoList.add(basketItemMapper.basketItemToBasketItemDto(basketItem));
         }
 
-        Map<String, List<BasketItemDto>> groupedItems = basketItemDtoList.stream()
-                .collect(Collectors.groupingBy(BasketItemDto::getName));
-        List<BasketItemDto> reducedItems = new ArrayList<>();
-        for (Map.Entry<String, List<BasketItemDto>> entry : groupedItems.entrySet()) {
-            BasketItemDto initial = new BasketItemDto();
-            initial.setStockAmount(0);
-            initial.setTotalPrice("0");
-            BasketItemDto reducedItem = entry.getValue().stream().reduce(initial, (a, b) -> {
-                a.setName(b.getName());
-                a.setStockAmount(a.getStockAmount() + b.getStockAmount());
-                a.setUnitPrice(b.getUnitPrice());
-                a.setTotalPrice(new BigDecimal(a.getTotalPrice()).add(new BigDecimal(b.getTotalPrice())).toString());
-                return a;
-            });
-            reducedItems.add(reducedItem);
-        }
-
         BigDecimal wholeBasketPrice = basketItemDtoList.stream()
                 .map(item -> new BigDecimal(item.getTotalPrice()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BasketTotalDto basketTotalDto = BasketTotalDto.builder()
-                .basketItemDtos(reducedItems)
+                .basketItemDtos(basketItemDtoList)
                 .wholeBasketPrice(wholeBasketPrice.toString())
                 .build();
         return basketTotalDto;
     }
 
-    public List<BasketItem> deleteBasket(Long id) {
+    public List<BasketItemDto> deleteBasket(Long id) {
         List<BasketItem> basketByUserId = basketItemRepository.findBasketsByUserId(id)
                 .orElseThrow(() -> new AppException("Basket not found.", HttpStatus.NOT_FOUND));
         basketItemRepository.deleteBasketItemsByUserId(id);
         log.info("The baskets of the user with id number {} have been deleted.", id);
-        return basketByUserId;
+        List<BasketItemDto> basketItemDtoList = basketItemMapper.basketItemsToBasketItemDtos(basketByUserId);
+        return basketItemDtoList;
     }
 }

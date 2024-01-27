@@ -5,6 +5,8 @@ import dev.aziz.grocerystore.entities.BasketItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface BasketItemMapper {
 
@@ -16,4 +18,5 @@ public interface BasketItemMapper {
             ")", target = "totalPrice")
     BasketItemDto basketItemToBasketItemDto(BasketItem basketItem);
 
+    List<BasketItemDto> basketItemsToBasketItemDtos(List<BasketItem> basketItems);
 }

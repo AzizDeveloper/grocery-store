@@ -1,5 +1,6 @@
 package dev.aziz.grocerystore.controllers;
 
+import dev.aziz.grocerystore.dtos.BasketItemDto;
 import dev.aziz.grocerystore.dtos.BasketTotalDto;
 import dev.aziz.grocerystore.dtos.UserDto;
 import dev.aziz.grocerystore.entities.BasketItem;
@@ -24,9 +25,9 @@ public class BasketItemController {
     private final BasketItemService basketItemService;
 
     @PostMapping("/items/{item_id}/amount/{amount}")
-    public ResponseEntity<BasketItem> addItemToBasket(@AuthenticationPrincipal UserDto userDto,
-                                                      @PathVariable Long item_id,
-                                                      @PathVariable Integer amount) {
+    public ResponseEntity<BasketItemDto> addItemToBasket(@AuthenticationPrincipal UserDto userDto,
+                                                         @PathVariable Long item_id,
+                                                         @PathVariable Integer amount) {
         return ResponseEntity.ok(basketItemService.addItem(userDto.getLogin(), item_id, amount));
     }
 
@@ -36,7 +37,7 @@ public class BasketItemController {
     }
 
     @DeleteMapping
-    public ResponseEntity<List<BasketItem>> deleteBasket(@AuthenticationPrincipal UserDto userDto) {
+    public ResponseEntity<List<BasketItemDto>> deleteBasket(@AuthenticationPrincipal UserDto userDto) {
         return ResponseEntity.ok(basketItemService.deleteBasket(userDto.getId()));
     }
 

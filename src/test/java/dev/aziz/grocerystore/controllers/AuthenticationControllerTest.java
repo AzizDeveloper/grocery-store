@@ -1,35 +1,31 @@
 package dev.aziz.grocerystore.controllers;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.aziz.grocerystore.config.UserAuthProvider;
 import dev.aziz.grocerystore.dtos.CredentialsDto;
+import dev.aziz.grocerystore.dtos.SignUpDto;
 import dev.aziz.grocerystore.dtos.UserDto;
-import dev.aziz.grocerystore.services.BasketItemService;
 import dev.aziz.grocerystore.services.UserService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Spy;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Date;
-
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AuthenticationController.class)
-@AutoConfigureMockMvc(addFilters = false)
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
 class AuthenticationControllerTest {
 
     @Autowired
@@ -38,7 +34,7 @@ class AuthenticationControllerTest {
     @MockBean
     public UserService userService;
 
-    @MockBean
+    @Autowired
     public UserAuthProvider userAuthProvider;
 
     @Autowired
@@ -47,57 +43,72 @@ class AuthenticationControllerTest {
     @Test
     void login() throws Exception {
         //given
-
-        UserDto userDto = UserDto.builder()
-                .id(1L)
-                .login("azizdev")
-                .firstName("Aziz")
-                .lastName("Abdukarimov")
-                .token("There should be token?")
-                .build();
-        userDto.setToken("my-token");
+        UserDto userDto = UserDto.builder().id(1L).login("azizdev").firstName("Aziz").lastName("Abdukarimov").build();
+        String token1 = userAuthProvider.createToken(userDto.getLogin());
+        userDto.setToken(token1);
 
         char[] password = {'a', 's', 'd'};
-        CredentialsDto credentialsDto = CredentialsDto.builder()
-                .login("azizdev")
-                .password(password)
-                .build();
+        CredentialsDto credentialsDto = CredentialsDto.builder().login("azizdev").password(password).build();
         String credentialsRequest = objectMapper.writeValueAsString(credentialsDto);
-
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + 3_600_000);
-        String token = JWT.create()
-                .withIssuer(credentialsDto.getLogin())
-                .withIssuedAt(now)
-                .withExpiresAt(validity)
-                .sign(Algorithm.HMAC256("my-token"));
-        userDto.setToken(token);
 
         //when
         when(userService.login(credentialsDto)).thenReturn(userDto);
-        when(userAuthProvider.createToken(credentialsDto.getLogin())).thenReturn(token);
 
         //then
         mockMvc.perform(post("/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(credentialsRequest)
-                        .with(csrf())
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.login").value(userDto.getLogin()))
+                .andExpect(jsonPath("$.firstName").value(userDto.getFirstName()))
+        ;
+    }
+
+    @Test
+    void register() throws Exception {
+        //given
+        UserDto userDto = UserDto.builder().id(1L).login("azizdev").firstName("Aziz").lastName("Abdukarimov").build();
+        String token1 = userAuthProvider.createToken(userDto.getLogin());
+        userDto.setToken(token1);
+
+        char[] password = {'1', '2', '3', '4'};
+        SignUpDto signUpDto = SignUpDto.builder()
+                .login("azizdev")
+                .firstName("Aziz")
+                .lastName("Abdukarimov")
+                .password(password)
+                .build();
+        String signUpDtoRequest = objectMapper.writeValueAsString(signUpDto);
+
+        //when
+        when(userService.register(signUpDto)).thenReturn(userDto);
+
+        //then
+        mockMvc.perform(post("/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(signUpDtoRequest)
+                )
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.login").value(userDto.getLogin()))
+                .andExpect(jsonPath("$.firstName").value(userDto.getFirstName()))
+        ;
+    }
+
+    @Test
+    void logOut() throws Exception {
+        //given
+        UserDto userDto = UserDto.builder().id(1L).login("azizdev").firstName("Aziz").lastName("Abdukarimov").build();
+        String token1 = userAuthProvider.createToken(userDto.getLogin());
+        userDto.setToken(token1);
+
+        //when then
+        mockMvc.perform(post("/signout")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Bearer Token", token1)
                 )
                 .andDo(print())
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void register() {
-        //given
-        //when
-        //then
-    }
-
-    @Test
-    void logOut() {
-        //given
-        //when
-        //then
+                .andExpect(status().isNoContent())
+        ;
     }
 }

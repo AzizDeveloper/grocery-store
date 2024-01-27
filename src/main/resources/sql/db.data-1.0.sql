@@ -43,3 +43,8 @@ INSERT INTO basket_item (user_id, item_id, amount) VALUES (2, 1, 50);
 INSERT INTO basket_item (user_id, item_id, amount) VALUES (3, 3, 20);
 INSERT INTO basket_item (user_id, item_id, amount) VALUES (3, 3, 30);
 INSERT INTO basket_item (user_id, item_id, amount) VALUES (3, 1, 50);
+
+--changeset aziz:10
+
+DELETE FROM basket_item WHERE id = 4;
+DELETE FROM basket_item WHERE id = 6;

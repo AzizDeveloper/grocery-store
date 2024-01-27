@@ -16,6 +16,10 @@ public interface BasketItemRepository extends JpaRepository<BasketItem, Long> {
 
     Optional<List<BasketItem>> findBasketsByUserId(Long id);
 
+    Optional<BasketItem> findBasketItemByUserId(Long id);
+
+    Optional<BasketItem> findBasketItemByUserIdAndItemId(Long userId, Long ItemId);
+
     @Modifying
     @Transactional
     @Query(nativeQuery = true,
