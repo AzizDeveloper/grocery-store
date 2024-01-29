@@ -42,3 +42,14 @@ CREATE TABLE IF NOT EXISTS app_user (
     password VARCHAR(255) NOT NULL
 );
 --rollback drop table app_user;
+
+--changeset aziz:8
+CREATE TABLE IF NOT EXISTS basket_item (
+    id SERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    item_id BIGINT NOT NULL,
+    amount INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES app_user(id),
+    FOREIGN KEY (item_id) REFERENCES item(id)
+);
+--rollback drop table basket_item;
