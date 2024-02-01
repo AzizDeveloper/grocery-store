@@ -6,6 +6,7 @@ import dev.aziz.grocerystore.entities.BasketItem;
 import dev.aziz.grocerystore.entities.Item;
 import dev.aziz.grocerystore.entities.User;
 import dev.aziz.grocerystore.exceptions.AppException;
+import dev.aziz.grocerystore.handlers.PriceHandler;
 import dev.aziz.grocerystore.mappers.BasketItemMapper;
 import dev.aziz.grocerystore.repositories.BasketItemRepository;
 import dev.aziz.grocerystore.repositories.ItemRepository;
@@ -15,12 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -75,18 +72,12 @@ public class BasketItemService {
         List<BasketItem> basketByUser = basketItemRepository.findBasketsByUserId(user.getId())
                 .orElseThrow(() -> new AppException("Basket not found.", HttpStatus.NOT_FOUND));
 
-        List<BasketItemDto> basketItemDtoList = new ArrayList<>();
-        for (BasketItem basketItem : basketByUser) {
-            basketItemDtoList.add(basketItemMapper.basketItemToBasketItemDto(basketItem));
-        }
-
-        BigDecimal wholeBasketPrice = basketItemDtoList.stream()
-                .map(item -> new BigDecimal(item.getTotalPrice()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        List<BasketItemDto> basketItemDtoList = basketItemMapper.basketItemsToBasketItemDtos(basketByUser);
+        PriceHandler priceHandler = new PriceHandler(basketByUser);
 
         BasketTotalDto basketTotalDto = BasketTotalDto.builder()
                 .basketItemDtos(basketItemDtoList)
-                .wholeBasketPrice(wholeBasketPrice.toString())
+                .wholeBasketPrice(priceHandler.computePrice().toString())
                 .build();
         return basketTotalDto;
     }
