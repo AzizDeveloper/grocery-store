@@ -10,6 +10,7 @@ import dev.aziz.grocerystore.handlers.PriceHandler;
 import dev.aziz.grocerystore.mappers.BasketItemMapper;
 import dev.aziz.grocerystore.repositories.BasketItemRepository;
 import dev.aziz.grocerystore.repositories.ItemRepository;
+import dev.aziz.grocerystore.repositories.UserPromotionRepository;
 import dev.aziz.grocerystore.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class BasketItemService {
     private final BasketItemRepository basketItemRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final UserPromotionRepository userPromotionRepository;
     private final BasketItemMapper basketItemMapper;
 
 
@@ -73,7 +75,7 @@ public class BasketItemService {
                 .orElseThrow(() -> new AppException("Basket not found.", HttpStatus.NOT_FOUND));
 
         List<BasketItemDto> basketItemDtoList = basketItemMapper.basketItemsToBasketItemDtos(basketByUser);
-        PriceHandler priceHandler = new PriceHandler(basketByUser);
+        PriceHandler priceHandler = new PriceHandler(userPromotionRepository, basketByUser);
 
         BasketTotalDto basketTotalDto = BasketTotalDto.builder()
                 .basketItemDtos(basketItemDtoList)

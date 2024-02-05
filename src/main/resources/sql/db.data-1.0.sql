@@ -48,3 +48,10 @@ INSERT INTO basket_item (user_id, item_id, amount) VALUES (3, 1, 50);
 
 DELETE FROM basket_item WHERE id = 4;
 DELETE FROM basket_item WHERE id = 6;
+
+--changeset aziz:13
+INSERT INTO promotion_config (promotion_type, minimum_amount, free_amount, created_date, end_date)
+VALUES ('MORE_FREE', 2, 1, CURRENT_TIMESTAMP, NOW() + INTERVAL '6 months');
+
+--changeset aziz:14
+INSERT INTO user_promotion (user_id, promotion_config_id) VALUES(2, 1);
