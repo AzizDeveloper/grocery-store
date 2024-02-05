@@ -4,11 +4,14 @@ import dev.aziz.grocerystore.dtos.BasketItemDto;
 import dev.aziz.grocerystore.dtos.BasketTotalDto;
 import dev.aziz.grocerystore.entities.BasketItem;
 import dev.aziz.grocerystore.entities.Item;
+import dev.aziz.grocerystore.entities.ItemPromotion;
 import dev.aziz.grocerystore.entities.User;
+import dev.aziz.grocerystore.entities.UserPromotion;
 import dev.aziz.grocerystore.exceptions.AppException;
 import dev.aziz.grocerystore.handlers.PriceHandler;
 import dev.aziz.grocerystore.mappers.BasketItemMapper;
 import dev.aziz.grocerystore.repositories.BasketItemRepository;
+import dev.aziz.grocerystore.repositories.ItemPromotionRepository;
 import dev.aziz.grocerystore.repositories.ItemRepository;
 import dev.aziz.grocerystore.repositories.UserPromotionRepository;
 import dev.aziz.grocerystore.repositories.UserRepository;
@@ -29,6 +32,7 @@ public class BasketItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final UserPromotionRepository userPromotionRepository;
+    private final ItemPromotionRepository itemPromotionRepository;
     private final BasketItemMapper basketItemMapper;
 
 
@@ -74,16 +78,18 @@ public class BasketItemService {
         List<BasketItem> basketByUser = basketItemRepository.findBasketsByUserId(user.getId())
                 .orElseThrow(() -> new AppException("Basket not found.", HttpStatus.NOT_FOUND));
 
-        List<BasketItemDto> basketItemDtoList = basketItemMapper.basketItemsToBasketItemDtos(basketByUser);
-        PriceHandler priceHandler = new PriceHandler(userPromotionRepository, basketByUser);
+        List<UserPromotion> userPromotionList = userPromotionRepository.findUserPromotionsByUserId(user.getId());
+        List<ItemPromotion> itemPromotions = itemPromotionRepository.findAll();
 
+        PriceHandler priceHandler = new PriceHandler(itemPromotions, userPromotionList, basketByUser);
+
+        List<BasketItemDto> basketItemDtoList = basketItemMapper.basketItemsToBasketItemDtos(basketByUser);
         BasketTotalDto basketTotalDto = BasketTotalDto.builder()
                 .basketItemDtos(basketItemDtoList)
                 .wholeBasketPrice(priceHandler.computePrice().toString())
                 .build();
         return basketTotalDto;
     }
-
     public List<BasketItemDto> deleteBasket(Long id) {
         List<BasketItem> basketByUserId = basketItemRepository.findBasketsByUserId(id)
                 .orElseThrow(() -> new AppException("Basket not found.", HttpStatus.NOT_FOUND));
@@ -92,4 +98,5 @@ public class BasketItemService {
         List<BasketItemDto> basketItemDtoList = basketItemMapper.basketItemsToBasketItemDtos(basketByUserId);
         return basketItemDtoList;
     }
+
 }

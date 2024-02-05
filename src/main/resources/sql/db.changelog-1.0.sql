@@ -74,3 +74,13 @@ CREATE TABLE IF NOT EXISTS user_promotion (
     FOREIGN KEY (promotion_config_id) REFERENCES promotion_config(id)
 );
 --rollback drop table user_promotion;
+
+--changeset aziz:15
+CREATE TABLE IF NOT EXISTS item_promotion (
+    id SERIAL PRIMARY KEY,
+    item_id BIGINT NOT NULL,
+    promotion_config_id BIGINT NOT NULL,
+    FOREIGN KEY (item_id) REFERENCES item(id),
+    FOREIGN KEY (promotion_config_id) REFERENCES promotion_config(id)
+);
+--rollback drop table item_promotion;

@@ -55,3 +55,6 @@ VALUES ('MORE_FREE', 2, 1, CURRENT_TIMESTAMP, NOW() + INTERVAL '6 months');
 
 --changeset aziz:14
 INSERT INTO user_promotion (user_id, promotion_config_id) VALUES(2, 1);
+
+--changeset aziz:16
+INSERT INTO item_promotion (item_id, promotion_config_id) VALUES(1, 1);
