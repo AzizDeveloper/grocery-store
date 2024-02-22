@@ -4,7 +4,6 @@ import dev.aziz.grocerystore.dtos.BasketItemDto;
 import dev.aziz.grocerystore.dtos.BasketTotalDto;
 import dev.aziz.grocerystore.entities.BasketItem;
 import dev.aziz.grocerystore.entities.Item;
-import dev.aziz.grocerystore.entities.ItemPromotion;
 import dev.aziz.grocerystore.entities.PromotionConfig;
 import dev.aziz.grocerystore.entities.User;
 import dev.aziz.grocerystore.entities.UserPromotion;
@@ -12,8 +11,8 @@ import dev.aziz.grocerystore.enums.PromotionType;
 import dev.aziz.grocerystore.mappers.BasketItemMapper;
 import dev.aziz.grocerystore.mappers.BasketItemMapperImpl;
 import dev.aziz.grocerystore.repositories.BasketItemRepository;
-import dev.aziz.grocerystore.repositories.ItemPromotionRepository;
 import dev.aziz.grocerystore.repositories.ItemRepository;
+import dev.aziz.grocerystore.repositories.PromotionConfigRepository;
 import dev.aziz.grocerystore.repositories.UserPromotionRepository;
 import dev.aziz.grocerystore.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -53,7 +52,7 @@ class BasketItemServiceTest {
     private UserPromotionRepository userPromotionRepository;
 
     @Mock
-    private ItemPromotionRepository itemPromotionRepository;
+    private PromotionConfigRepository promotionConfigRepository;
 
     @Spy
     private BasketItemMapper basketItemMapper = new BasketItemMapperImpl();
@@ -104,25 +103,22 @@ class BasketItemServiceTest {
                 BasketItemDto.builder().name("Fanta").stockAmount(30).unitPrice("1").totalPrice("30").build(),
                 BasketItemDto.builder().name("Black tea").stockAmount(40).unitPrice("10").totalPrice("400").build()
         );
-        BasketTotalDto basketTotalDto = BasketTotalDto.builder().wholeBasketPrice("225").basketItemDtos(basketItemDtos).build();
+        BasketTotalDto basketTotalDto = BasketTotalDto.builder().wholeBasketPrice("440").basketItemDtos(basketItemDtos).build();
 
         PromotionConfig promotionConfig = PromotionConfig.builder()
                 .id(1L)
                 .promotionType(PromotionType.MORE_FREE)
                 .minimumAmount(2)
                 .freeAmount(1)
+                .item(item1)
                 .createdDate(Instant.now())
                 .endDate(Instant.now().plus(180, ChronoUnit.DAYS))
                 .build();
         UserPromotion userPromotion = UserPromotion.builder().id(1L).user(user).promotionConfig(promotionConfig).build();
         List<UserPromotion> userPromotionList = List.of(userPromotion);
-        ItemPromotion itemPromotion1 = ItemPromotion.builder().id(1L).item(item1).promotionConfig(promotionConfig).build();
-        ItemPromotion itemPromotion2 = ItemPromotion.builder().id(2L).item(item2).promotionConfig(promotionConfig).build();
-        ItemPromotion itemPromotion3 = ItemPromotion.builder().id(3L).item(item3).promotionConfig(promotionConfig).build();
-        List<ItemPromotion> itemPromotionList = List.of(itemPromotion1, itemPromotion2, itemPromotion3);
         when(userRepository.findByLogin(user.getLogin())).thenReturn(Optional.of(user));
+        when(promotionConfigRepository.findAll()).thenReturn(Arrays.asList(promotionConfig));
         when(userPromotionRepository.findUserPromotionsByUserId(user.getId())).thenReturn(userPromotionList);
-        when(itemPromotionRepository.findAll()).thenReturn(itemPromotionList);
         when(basketItemRepository.findBasketsByUserId(userId)).thenReturn(Optional.of(basketItemList));
         BasketTotalDto result = basketItemService.getItems(user.getLogin());
 

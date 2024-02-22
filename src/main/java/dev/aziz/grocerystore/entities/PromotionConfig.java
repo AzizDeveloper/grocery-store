@@ -1,15 +1,7 @@
 package dev.aziz.grocerystore.entities;
 
 import dev.aziz.grocerystore.enums.PromotionType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,6 +34,9 @@ public class PromotionConfig {
 
     @NotNull(message = "Free amount should not be empty")
     private Integer freeAmount;
+
+    @OneToOne
+    private Item item;
 
     @CreatedDate
     @Column(name = "created_date")

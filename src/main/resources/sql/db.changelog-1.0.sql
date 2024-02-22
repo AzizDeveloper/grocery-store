@@ -84,3 +84,14 @@ CREATE TABLE IF NOT EXISTS item_promotion (
     FOREIGN KEY (promotion_config_id) REFERENCES promotion_config(id)
 );
 --rollback drop table item_promotion;
+
+--changeset aziz:17
+TRUNCATE TABLE item_promotion;
+DROP TABLE item_promotion;
+--rollback create table item_promotion;
+
+--changeset aziz:18
+ALTER TABLE promotion_config
+ADD COLUMN item_id BIGINT,
+ADD CONSTRAINT fk_item_id FOREIGN KEY (item_id) REFERENCES item(id);
+--rollback alter table promotion_config drop column item_id, drop constraint fk_item_id;

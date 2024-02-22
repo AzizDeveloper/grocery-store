@@ -58,3 +58,12 @@ INSERT INTO user_promotion (user_id, promotion_config_id) VALUES(2, 1);
 
 --changeset aziz:16
 INSERT INTO item_promotion (item_id, promotion_config_id) VALUES(1, 1);
+
+--changeset aziz:19
+UPDATE promotion_config SET item_id=1 WHERE id=1;
+
+INSERT INTO promotion_config (item_id, promotion_type, minimum_amount, free_amount, created_date, end_date)
+VALUES (2, 'MORE_FREE', 2, 1, CURRENT_TIMESTAMP, NOW() + INTERVAL '6 months');
+
+--changeset aziz:20
+INSERT INTO user_promotion (user_id, promotion_config_id) VALUES(2, 35);
