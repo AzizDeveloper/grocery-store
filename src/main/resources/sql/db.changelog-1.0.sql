@@ -53,3 +53,45 @@ CREATE TABLE IF NOT EXISTS basket_item (
     FOREIGN KEY (item_id) REFERENCES item(id)
 );
 --rollback drop table basket_item;
+
+--changeset aziz:11
+CREATE TABLE IF NOT EXISTS promotion_config (
+    id SERIAL PRIMARY KEY,
+    promotion_type TEXT NOT NULL,
+    minimum_amount BIGINT NOT NULL,
+    free_amount BIGINT NOT NULL,
+    created_date TIMESTAMPTZ,
+    end_date TIMESTAMPTZ
+);
+--rollback drop table promotion_config;
+
+--changeset aziz:12
+CREATE TABLE IF NOT EXISTS user_promotion (
+    id SERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    promotion_config_id BIGINT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES app_user(id),
+    FOREIGN KEY (promotion_config_id) REFERENCES promotion_config(id)
+);
+--rollback drop table user_promotion;
+
+--changeset aziz:15
+CREATE TABLE IF NOT EXISTS item_promotion (
+    id SERIAL PRIMARY KEY,
+    item_id BIGINT NOT NULL,
+    promotion_config_id BIGINT NOT NULL,
+    FOREIGN KEY (item_id) REFERENCES item(id),
+    FOREIGN KEY (promotion_config_id) REFERENCES promotion_config(id)
+);
+--rollback drop table item_promotion;
+
+--changeset aziz:17
+TRUNCATE TABLE item_promotion;
+DROP TABLE item_promotion;
+--rollback create table item_promotion;
+
+--changeset aziz:18
+ALTER TABLE promotion_config
+ADD COLUMN item_id BIGINT,
+ADD CONSTRAINT fk_item_id FOREIGN KEY (item_id) REFERENCES item(id);
+--rollback alter table promotion_config drop column item_id, drop constraint fk_item_id;
