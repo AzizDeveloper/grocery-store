@@ -4,7 +4,6 @@ import dev.aziz.grocerystore.dtos.BasketItemDto;
 import dev.aziz.grocerystore.dtos.BasketTotalDto;
 import dev.aziz.grocerystore.entities.BasketItem;
 import dev.aziz.grocerystore.entities.Item;
-import dev.aziz.grocerystore.entities.PromotionConfig;
 import dev.aziz.grocerystore.entities.User;
 import dev.aziz.grocerystore.entities.UserPromotion;
 import dev.aziz.grocerystore.exceptions.AppException;
@@ -12,7 +11,6 @@ import dev.aziz.grocerystore.handlers.PriceHandler;
 import dev.aziz.grocerystore.mappers.BasketItemMapper;
 import dev.aziz.grocerystore.repositories.BasketItemRepository;
 import dev.aziz.grocerystore.repositories.ItemRepository;
-import dev.aziz.grocerystore.repositories.PromotionConfigRepository;
 import dev.aziz.grocerystore.repositories.UserPromotionRepository;
 import dev.aziz.grocerystore.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +31,6 @@ public class BasketItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final UserPromotionRepository userPromotionRepository;
-    private final PromotionConfigRepository promotionConfigRepository;
     private final BasketItemMapper basketItemMapper;
 
 
@@ -78,13 +76,12 @@ public class BasketItemService {
         List<BasketItem> basketByUser = basketItemRepository.findBasketsByUserId(user.getId())
                 .orElseThrow(() -> new AppException("Basket not found.", HttpStatus.NOT_FOUND));
 
-        List<UserPromotion> userPromotionList = userPromotionRepository.findUserPromotionsByUserId(user.getId());
-
-        List<PromotionConfig> promotions = promotionConfigRepository.findAll();
+        List<UserPromotion> userPromotionList = userPromotionRepository
+                .findUserPromotionsByUserIdAndPromotionConfigEndDateAfter(user.getId(), Instant.now());
 
         List<BasketItemDto> basketItemDtoList = basketItemMapper.basketItemsToBasketItemDtos(basketByUser);
 
-        PriceHandler priceHandler = new PriceHandler(userPromotionList, promotions, basketByUser);
+        PriceHandler priceHandler = new PriceHandler(userPromotionList, basketByUser);
 
         BasketTotalDto basketTotalDto = BasketTotalDto.builder()
                 .basketItemDtos(basketItemDtoList)

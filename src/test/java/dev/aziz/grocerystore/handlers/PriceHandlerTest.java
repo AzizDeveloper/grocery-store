@@ -34,18 +34,17 @@ public class PriceHandlerTest {
                 .createdDate(Instant.now())
                 .endDate(Instant.now().plus(180, ChronoUnit.DAYS))
                 .build();
-        List<PromotionConfig> promotions = Arrays.asList(promotionConfig);
         UserPromotion userPromotion = UserPromotion.builder().id(1L).user(bob).promotionConfig(promotionConfig).build();
         List<UserPromotion> userPromotions = List.of(userPromotion);
-        PriceHandler priceHandler = new PriceHandler(userPromotions, promotions, List.of(basketItem1));
+        PriceHandler priceHandler = new PriceHandler(userPromotions, List.of(basketItem1));
 
         //when
         BigDecimal wholeBasketPrice = priceHandler.computePrice();
 
         //then
         assertAll(() -> {
-            assertEquals(BigDecimal.valueOf(50), wholeBasketPrice);
-            assertEquals("50", wholeBasketPrice.toString());
+            assertEquals(BigDecimal.valueOf(70), wholeBasketPrice);
+            assertEquals("70", wholeBasketPrice.toString());
         });
     }
 
@@ -65,7 +64,7 @@ public class PriceHandlerTest {
                 BasketItem.builder().id(4L).amount(40).item(greenTea).user(bob).build(), // 1600
                 BasketItem.builder().id(5L).amount(50).item(iceTea).user(bob).build()    // 2500
         );
-        PromotionConfig promotionConfig = PromotionConfig.builder()
+        PromotionConfig greenTeaPromo = PromotionConfig.builder()
                 .id(1L)
                 .promotionType(PromotionType.MORE_FREE)
                 .minimumAmount(2)
@@ -74,20 +73,19 @@ public class PriceHandlerTest {
                 .createdDate(Instant.now())
                 .endDate(Instant.now().plus(180, ChronoUnit.DAYS))
                 .build();
-        List<PromotionConfig> promotions = Arrays.asList(promotionConfig);
         List<UserPromotion> userPromotions = Arrays.asList(
-                UserPromotion.builder().id(1L).user(bob).promotionConfig(promotionConfig).build()
+                UserPromotion.builder().id(1L).user(bob).promotionConfig(greenTeaPromo).build()
         );
 
-        PriceHandler priceHandler = new PriceHandler(userPromotions, promotions, basketItems);
+        PriceHandler priceHandler = new PriceHandler(userPromotions, basketItems);
 
         //when
         BigDecimal wholeBasketPrice = priceHandler.computePrice();
 
         //then
         assertAll(() -> {
-            assertEquals(BigDecimal.valueOf(4700), wholeBasketPrice);
-            assertEquals("4700", wholeBasketPrice.toString());
+            assertEquals(BigDecimal.valueOf(4980), wholeBasketPrice);
+            assertEquals("4980", wholeBasketPrice.toString());
         });
     }
 
@@ -113,11 +111,11 @@ public class PriceHandlerTest {
                 BasketItem.builder().id(5L).amount(50).item(iceTea).user(bob).build(),       // 2500
                 BasketItem.builder().id(6L).amount(50).item(sevenUp).user(bob).build(),      // 3500
                 BasketItem.builder().id(7L).amount(50).item(pepsi).user(bob).build(),        // 2500
-                BasketItem.builder().id(8L).amount(50).item(pepsiZero).user(bob).build(),    // 2000
+                BasketItem.builder().id(8L).amount(50).item(pepsiZero).user(bob).build(),    // 2000 - * 1360
                 BasketItem.builder().id(9L).amount(50).item(colaZero).user(bob).build(),     // 2000
-                BasketItem.builder().id(10L).amount(50).item(mountainDew).user(bob).build()  // 3000
+                BasketItem.builder().id(10L).amount(50).item(mountainDew).user(bob).build()  // 3000 - * 2040
         );
-        PromotionConfig promotionConfig1 = PromotionConfig.builder()
+        PromotionConfig pepsiZeroPromo = PromotionConfig.builder()
                 .id(1L)
                 .promotionType(PromotionType.MORE_FREE)
                 .minimumAmount(2)
@@ -127,7 +125,7 @@ public class PriceHandlerTest {
                 .endDate(Instant.now().plus(180, ChronoUnit.DAYS))
                 .build();
 
-        PromotionConfig promotionConfig2 = PromotionConfig.builder()
+        PromotionConfig mountainDewPromo = PromotionConfig.builder()
                 .id(2L)
                 .promotionType(PromotionType.MORE_FREE)
                 .minimumAmount(2)
@@ -138,19 +136,18 @@ public class PriceHandlerTest {
                 .build();
 
         List<UserPromotion> userPromotions = List.of(
-                UserPromotion.builder().id(1L).user(bob).promotionConfig(promotionConfig1).build(),
-                UserPromotion.builder().id(2L).user(bob).promotionConfig(promotionConfig2).build()
+                UserPromotion.builder().id(1L).user(bob).promotionConfig(pepsiZeroPromo).build(),
+                UserPromotion.builder().id(2L).user(bob).promotionConfig(mountainDewPromo).build()
         );
-        List<PromotionConfig> promotions = List.of(promotionConfig1, promotionConfig2);
-        PriceHandler priceHandler = new PriceHandler(userPromotions, promotions, basketItems);
+        PriceHandler priceHandler = new PriceHandler(userPromotions, basketItems);
 
         //when
         BigDecimal wholeBasketPrice = priceHandler.computePrice();
 
         //then
         assertAll(() -> {
-            assertEquals(BigDecimal.valueOf(16000), wholeBasketPrice);
-            assertEquals("16000", wholeBasketPrice.toString());
+            assertEquals(BigDecimal.valueOf(16900), wholeBasketPrice);
+            assertEquals("16900", wholeBasketPrice.toString());
         });
     }
 }
