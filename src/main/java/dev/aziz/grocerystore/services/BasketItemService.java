@@ -8,6 +8,7 @@ import dev.aziz.grocerystore.entities.User;
 import dev.aziz.grocerystore.entities.UserPromotion;
 import dev.aziz.grocerystore.exceptions.AppException;
 import dev.aziz.grocerystore.handlers.PriceHandler;
+import dev.aziz.grocerystore.handlers.PriceHandlerContext;
 import dev.aziz.grocerystore.mappers.BasketItemMapper;
 import dev.aziz.grocerystore.repositories.BasketItemRepository;
 import dev.aziz.grocerystore.repositories.ItemRepository;
@@ -81,7 +82,9 @@ public class BasketItemService {
 
         List<BasketItemDto> basketItemDtoList = basketItemMapper.basketItemsToBasketItemDtos(basketByUser);
 
-        PriceHandler priceHandler = new PriceHandler(userPromotionList, basketByUser);
+        PriceHandlerContext priceHandlerContext = new PriceHandlerContext(userPromotionList, basketByUser);
+
+        PriceHandler priceHandler = new PriceHandler(priceHandlerContext);
 
         BasketTotalDto basketTotalDto = BasketTotalDto.builder()
                 .basketItemDtos(basketItemDtoList)

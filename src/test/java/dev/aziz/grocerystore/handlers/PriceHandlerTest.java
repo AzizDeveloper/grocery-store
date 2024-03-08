@@ -36,7 +36,8 @@ public class PriceHandlerTest {
                 .build();
         UserPromotion userPromotion = UserPromotion.builder().id(1L).user(bob).promotionConfig(promotionConfig).build();
         List<UserPromotion> userPromotions = List.of(userPromotion);
-        PriceHandler priceHandler = new PriceHandler(userPromotions, List.of(basketItem1));
+        PriceHandlerContext priceHandlerContext = new PriceHandlerContext(userPromotions, List.of(basketItem1));
+        PriceHandler priceHandler = new PriceHandler(priceHandlerContext);
 
         //when
         BigDecimal wholeBasketPrice = priceHandler.computePrice();
@@ -77,7 +78,9 @@ public class PriceHandlerTest {
                 UserPromotion.builder().id(1L).user(bob).promotionConfig(greenTeaPromo).build()
         );
 
-        PriceHandler priceHandler = new PriceHandler(userPromotions, basketItems);
+        PriceHandlerContext priceHandlerContext = new PriceHandlerContext(userPromotions, basketItems);
+
+        PriceHandler priceHandler = new PriceHandler(priceHandlerContext);
 
         //when
         BigDecimal wholeBasketPrice = priceHandler.computePrice();
@@ -139,7 +142,10 @@ public class PriceHandlerTest {
                 UserPromotion.builder().id(1L).user(bob).promotionConfig(pepsiZeroPromo).build(),
                 UserPromotion.builder().id(2L).user(bob).promotionConfig(mountainDewPromo).build()
         );
-        PriceHandler priceHandler = new PriceHandler(userPromotions, basketItems);
+
+        PriceHandlerContext priceHandlerContext = new PriceHandlerContext(userPromotions, basketItems);
+
+        PriceHandler priceHandler = new PriceHandler(priceHandlerContext);
 
         //when
         BigDecimal wholeBasketPrice = priceHandler.computePrice();
