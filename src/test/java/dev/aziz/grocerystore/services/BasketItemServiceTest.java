@@ -104,14 +104,14 @@ class BasketItemServiceTest {
                 BasketItemDto.builder().name("Black tea").stockAmount(40).unitPrice("10").totalPrice("400").build()
         );
         BasketTotalDto basketTotalDto = BasketTotalDto.builder()
-                .wholeBasketPrice("444")
+                .wholeBasketPrice("444.0")
                 .basketItemDtos(basketItemDtos).build();
 
         PromotionConfig colaPromo = PromotionConfig.builder()
                 .id(1L)
                 .promotionType(PromotionType.MORE_FREE)
                 .minimumAmount(2)
-                .freeAmount(1)
+                .freeAmount(1.0)
                 .item(colaItem)
                 .createdDate(Instant.now().minus(90, ChronoUnit.DAYS))
                 .endDate(Instant.now().plus(180, ChronoUnit.DAYS))

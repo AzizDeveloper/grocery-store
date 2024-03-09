@@ -29,7 +29,7 @@ public class PriceHandlerTest {
                 .id(1L)
                 .promotionType(PromotionType.MORE_FREE)
                 .minimumAmount(2)
-                .freeAmount(1)
+                .freeAmount(1.0)
                 .item(cola)
                 .createdDate(Instant.now())
                 .endDate(Instant.now().plus(180, ChronoUnit.DAYS))
@@ -44,8 +44,8 @@ public class PriceHandlerTest {
 
         //then
         assertAll(() -> {
-            assertEquals(BigDecimal.valueOf(70), wholeBasketPrice);
-            assertEquals("70", wholeBasketPrice.toString());
+            assertEquals(BigDecimal.valueOf(70.0), wholeBasketPrice);
+            assertEquals("70.0", wholeBasketPrice.toString());
         });
     }
 
@@ -69,7 +69,7 @@ public class PriceHandlerTest {
                 .id(1L)
                 .promotionType(PromotionType.MORE_FREE)
                 .minimumAmount(2)
-                .freeAmount(1)
+                .freeAmount(1.0)
                 .item(greenTea)
                 .createdDate(Instant.now())
                 .endDate(Instant.now().plus(180, ChronoUnit.DAYS))
@@ -87,8 +87,8 @@ public class PriceHandlerTest {
 
         //then
         assertAll(() -> {
-            assertEquals(BigDecimal.valueOf(4980), wholeBasketPrice);
-            assertEquals("4980", wholeBasketPrice.toString());
+            assertEquals(BigDecimal.valueOf(4980.0), wholeBasketPrice);
+            assertEquals("4980.0", wholeBasketPrice.toString());
         });
     }
 
@@ -122,7 +122,7 @@ public class PriceHandlerTest {
                 .id(1L)
                 .promotionType(PromotionType.MORE_FREE)
                 .minimumAmount(2)
-                .freeAmount(1)
+                .freeAmount(1.0)
                 .item(pepsiZero)
                 .createdDate(Instant.now())
                 .endDate(Instant.now().plus(180, ChronoUnit.DAYS))
@@ -132,7 +132,7 @@ public class PriceHandlerTest {
                 .id(2L)
                 .promotionType(PromotionType.MORE_FREE)
                 .minimumAmount(2)
-                .freeAmount(1)
+                .freeAmount(1.0)
                 .item(mountainDew)
                 .createdDate(Instant.now())
                 .endDate(Instant.now().plus(180, ChronoUnit.DAYS))
@@ -152,8 +152,8 @@ public class PriceHandlerTest {
 
         //then
         assertAll(() -> {
-            assertEquals(BigDecimal.valueOf(16900), wholeBasketPrice);
-            assertEquals("16900", wholeBasketPrice.toString());
+            assertEquals(BigDecimal.valueOf(16900.0), wholeBasketPrice);
+            assertEquals("16900.0", wholeBasketPrice.toString());
         });
     }
 }

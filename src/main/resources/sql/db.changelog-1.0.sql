@@ -95,3 +95,6 @@ ALTER TABLE promotion_config
 ADD COLUMN item_id BIGINT,
 ADD CONSTRAINT fk_item_id FOREIGN KEY (item_id) REFERENCES item(id);
 --rollback alter table promotion_config drop column item_id, drop constraint fk_item_id;
+
+--changeset aziz:21
+ALTER TABLE promotion_config ALTER COLUMN free_amount TYPE double precision;
