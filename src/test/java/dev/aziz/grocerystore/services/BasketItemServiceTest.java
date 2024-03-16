@@ -111,7 +111,7 @@ class BasketItemServiceTest {
                 .id(1L)
                 .promotionType(PromotionType.MORE_FREE)
                 .minimumAmount(2)
-                .freeAmount(1.0)
+                .freeAmount(1)
                 .item(colaItem)
                 .createdDate(Instant.now().minus(90, ChronoUnit.DAYS))
                 .endDate(Instant.now().plus(180, ChronoUnit.DAYS))

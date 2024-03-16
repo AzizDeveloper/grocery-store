@@ -98,3 +98,6 @@ ADD CONSTRAINT fk_item_id FOREIGN KEY (item_id) REFERENCES item(id);
 
 --changeset aziz:21
 ALTER TABLE promotion_config ALTER COLUMN free_amount TYPE double precision;
+
+--changeset aziz:22
+ALTER TABLE promotion_config ALTER COLUMN free_amount TYPE BIGINT;

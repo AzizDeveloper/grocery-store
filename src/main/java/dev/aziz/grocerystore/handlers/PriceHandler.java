@@ -32,7 +32,10 @@ public class PriceHandler {
             }
             if (itemPromotion != null) {
                 log.info("itemPromotion != null condition has passed for this item: {}.", basketItem.getItem().getName());
-                totalPrice = totalPrice.add(computePriceWithPromotion(basketItem, itemPromotion));
+                BigDecimal computedPriceWithPromotion = computePriceWithPromotion(basketItem, itemPromotion);
+                BigDecimal divided = computedPriceWithPromotion.divide(BigDecimal.valueOf(100));
+                log.info("Divided price: {}", divided);
+                totalPrice = totalPrice.add(divided);
             } else {
                 BigDecimal add = basketItem.getItem().getPrice().multiply(BigDecimal.valueOf(basketItem.getAmount()));
                 log.info("Total items without promotion: {}, and total price: {}", basketItem.getAmount(), add);
@@ -40,29 +43,25 @@ public class PriceHandler {
                 totalPrice = totalPrice.add(add);
             }
         }
+        log.info("Total price of the whole basket: {}", totalPrice);
         return totalPrice;
     }
 
     private BigDecimal computePriceWithPromotion(BasketItem basketItem, PromotionConfig promotionConfig) {
         Integer minAmount = promotionConfig.getMinimumAmount();
-        Double freeAmount = promotionConfig.getFreeAmount();
-        Double free = 0.0;
+        Integer freeAmount = promotionConfig.getFreeAmount();
+        Integer free = 0;
 
         if (basketItem.getAmount() >= minAmount) {
             if (PromotionType.MORE_FREE.equals(promotionConfig.getPromotionType())) {
-                int intFreeAmount = freeAmount.intValue();
-                free = ( basketItem.getAmount() / (minAmount + intFreeAmount) ) * freeAmount;
+                free = ( (basketItem.getAmount() * 100) / ( (minAmount + 1) * 100) ) * freeAmount;
             } else if (PromotionType.MORE_OFF.equals(promotionConfig.getPromotionType())) {
-                if (promotionConfig.getFreeAmount() < 1) {
-                    free = (basketItem.getAmount() / (minAmount + 1)) * freeAmount;
-                } else {
-                    free = ( basketItem.getAmount() / (minAmount + freeAmount) ) * freeAmount;
-                }
+                free = ( ( basketItem.getAmount() * 100 ) /( ( minAmount + 1 ) * 100) ) * freeAmount;
             }
         }
 
-        Double paidItems = basketItem.getAmount() - free;
-        log.info("paidItems which is Double: {}", paidItems);
+        Integer paidItems = (basketItem.getAmount() * 100) - free;
+        log.info("paidItems : {}", paidItems);
         log.info("Free items computed by Promotion: {}", free);
         log.info("Total number of items: {}", basketItem.getAmount());
         return basketItem.getItem().getPrice().multiply(BigDecimal.valueOf(paidItems));

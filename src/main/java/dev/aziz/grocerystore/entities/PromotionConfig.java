@@ -33,7 +33,7 @@ public class PromotionConfig {
     private Integer minimumAmount;
 
     @NotNull(message = "Free amount should not be empty")
-    private Double freeAmount;
+    private Integer freeAmount;
 
     @OneToOne
     private Item item;
