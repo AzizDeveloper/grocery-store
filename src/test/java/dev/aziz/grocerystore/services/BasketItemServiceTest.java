@@ -104,7 +104,7 @@ class BasketItemServiceTest {
                 BasketItemDto.builder().name("Black tea").stockAmount(40).unitPrice("10").totalPrice("400").build()
         );
         BasketTotalDto basketTotalDto = BasketTotalDto.builder()
-                .wholeBasketPrice("444")
+                .wholeBasketPrice("444.0")
                 .basketItemDtos(basketItemDtos).build();
 
         PromotionConfig colaPromo = PromotionConfig.builder()
